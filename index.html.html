@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MFF Irrigation Toolkit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050707;
+      --card-bg: #111418;
+      --accent: #35c163;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --border: #1f2933;
+      --danger: #f87171;
+      --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.6);
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+      background: radial-gradient(circle at top left, rgba(53,193,99,0.12), transparent 60%),
+                  radial-gradient(circle at bottom right, rgba(15,118,110,0.12), transparent 60%),
+                  var(--card-bg);
+      border-radius: 24px;
+      padding: 18px 16px 16px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      backdrop-filter: blur(18px);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .logo-pill {
+      border-radius: 999px;
+      padding: 4px 10px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+    }
+
+    .tab-switcher {
+      margin-top: 10px;
+      margin-bottom: 6px;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+      padding: 3px;
+      display: flex;
+      gap: 4px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      flex-wrap: wrap;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .tab-btn {
+      flex: 1;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.8rem;
+      padding: 6px 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .tab-btn span.icon {
+      font-size: 0.9rem;
+    }
+
+    .tab-btn.active {
+      background: radial-gradient(circle at top, #4ade80, #16a34a);
+      color: #022c22;
+      font-weight: 600;
+      box-shadow: 0 8px 18px rgba(22, 163, 74, 0.45);
+    }
+
+    .view {
+      display: none;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(53, 193, 99, 0.6);
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: var(--radius-lg);
+      padding: 12px 11px 10px;
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      margin-top: 8px;
+      max-width: 100%;
+    }
+
+    .section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .section-hint {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (max-width: 430px) {
+      .field-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .label-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .label-unit {
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #020617;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+
+    input[type="number"]::placeholder {
+      color: #6b7280;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.3);
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .controls-row.wrap-left {
+      justify-content: flex-start;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 12px;
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      outline: none;
+      transition: transform 0.07s ease, box-shadow 0.07s ease, filter 0.07s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at top left, #4ade80, #16a34a);
+      color: #022c22;
+      box-shadow: 0 12px 24px rgba(22, 163, 74, 0.5);
+      font-size: 0.84rem;
+      padding: 8px 14px;
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 4px 10px rgba(22, 163, 74, 0.7);
+      filter: brightness(0.95);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      padding-inline: 10px;
+    }
+
+    .btn-secondary:active {
+      transform: translateY(1px) scale(0.99);
+      filter: brightness(0.96);
+    }
+
+    .btn-chip {
+      font-size: 0.74rem;
+      padding: 5px 10px;
+    }
+
+    .rate-line {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .rate-value {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .inline-note {
+      margin-top: 4px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .inline-note strong {
+      color: #e5e7eb;
+    }
+
+    .result-card {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.14), rgba(15, 23, 42, 0.96));
+      border-radius: var(--radius-lg);
+      padding: 11px 10px 9px;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      margin-top: 7px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .result-main {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .result-number {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+
+    .result-unit {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .result-subline {
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: #d1fae5;
+    }
+
+    .result-meta {
+      margin-top: 3px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .result-meta strong {
+      color: #e5e7eb;
+    }
+
+    .targets-block {
+      margin-top: 7px;
+      padding-top: 5px;
+      border-top: 1px dashed rgba(148, 163, 184, 0.4);
+      font-size: 0.74rem;
+    }
+
+    .targets-title {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .targets-list div {
+      margin-bottom: 2px;
+    }
+
+    .error {
+      margin-top: 6px;
+      font-size: 0.76rem;
+      color: var(--danger);
+    }
+
+    .ghost {
+      opacity: 0.3;
+    }
+
+    .footnote {
+      margin-top: 6px;
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .active-target,
+    .active-emitter {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.3);
+      color: #bbf7d0;
+    }
+
+    /* === Trichome analyzer styles === */
+    .tri-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .tri-card-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .tri-chip-main {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      color: var(--muted);
+      background: rgba(15,23,42,0.9);
+      white-space: nowrap;
+    }
+
+    .tri-file-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+      margin-top: 4px;
+    }
+
+    .tri-file-label {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    #tri_fileInput {
+      font-size: 0.78rem;
+      max-width: 100%;
+    }
+
+    .tri-image-preview {
+      margin-top: 6px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(31,41,55,0.9);
+      max-height: 220px;
+      display: none;
+    }
+
+    .tri-image-preview img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .tri-results-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tri-result-card {
+      background: radial-gradient(circle at top, rgba(148,163,184,0.18), rgba(15,23,42,0.96));
+      border-radius: 10px;
+      padding: 6px 7px;
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.76rem;
+    }
+
+    .tri-label-row-mini {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 2px;
+    }
+
+    .tri-label {
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .tri-chip {
+      font-size: 0.68rem;
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    .tri-chip-clear {
+      border-color: rgba(129, 200, 255, 0.65);
+    }
+
+    .tri-chip-milky {
+      border-color: rgba(199, 210, 254, 0.7);
+    }
+
+    .tri-chip-amber {
+      border-color: rgba(252, 211, 77, 0.85);
+    }
+
+    .tri-value-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .tri-count {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .tri-percent {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .tri-overall {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .tri-overall span {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .tri-stage-badge {
+      display: inline-block;
+      margin-top: 3px;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      color: var(--muted);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .tri-stage-early {
+      border-color: #7dcaff;
+    }
+
+    .tri-stage-peak {
+      border-color: #4ade80;
+    }
+
+    .tri-stage-late {
+      border-color: #facc15;
+    }
+
+    .tri-hint {
+      margin-top: 5px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .tri-hint strong {
+      color: #e5e7eb;
+    }
+
+    canvas#tri_canvas {
+      display: none;
+    }
+
+    /* === Eazy Plug Moisture styles === */
+    .ez-image-preview {
+      margin-top: 8px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(31,41,55,0.9);
+      max-height: 220px;
+    }
+
+    .ez-image-preview img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .ez-video-wrapper {
+      margin-top: 8px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(31,41,55,0.9);
+      max-height: 260px;
+      background: #000;
+    }
+
+    .ez-video-wrapper video {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .debug-text {
+      margin-top: 4px;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .confidence-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .confidence-label {
+      font-weight: 500;
+    }
+
+    .confidence-bar-container {
+      flex: 1;
+      min-width: 80px;
+      height: 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.9);
+      overflow: hidden;
+    }
+
+    .confidence-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: radial-gradient(circle at left, #4ade80, #16a34a);
+      transition: width 0.18s ease-out;
+    }
+
+    .confidence-text {
+      font-size: 0.72rem;
+      color: #e5e7eb;
+      white-space: nowrap;
+    }
+
+    .ez-status-badge {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      color: var(--muted);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .ez-status-wet {
+      border-color: #38bdf8;
+    }
+
+    .ez-status-good {
+      border-color: #4ade80;
+    }
+
+    .ez-status-drysoon {
+      border-color: #facc15;
+    }
+
+    .ez-status-dry {
+      border-color: #f97316;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="title-block">
+        <div class="title">
+          MFF Irrigation Toolkit
+        </div>
+        <div class="subtitle">
+          Dryback spacing + runoff shots in one place.
+        </div>
+      </div>
+      <div class="logo-pill">
+        <span class="dot"></span>
+        McCall Family Farms
+      </div>
+    </div>
+
+    <div class="tab-switcher">
+      <button class="tab-btn active" data-view="drybackView">
+        <span class="icon">⏱</span> Dryback Time
+      </button>
+      <button class="tab-btn" data-view="runoffView">
+        <span class="icon">💧</span> Runoff Shot
+      </button>
+      <button class="tab-btn" data-view="trichomeView">
+        <span class="icon">🔬</span> Trichomes
+      </button>
+      <button class="tab-btn" data-view="eazyPlugView">
+        <span class="icon">🌱</span> Eazy Plug
+      </button>
+      <button class="tab-btn" data-view="weeklyLightView">
+        <span class="icon">🌞</span> Weekly Light
+      </button>
+    </div>
+
+    <!-- DRYBACK VIEW -->
+    <div id="drybackView" class="view active">
+      <div class="badge-row">
+        <div class="badge">
+          <span class="badge-dot"></span> VWC dryback-based
+        </div>
+        <div class="badge">
+          <span class="badge-dot"></span> P1 / P2 / Overnight
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title-row">
+          <div class="section-title">Observed Dryback</div>
+          <div class="section-hint">From your sensor trend</div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field">
+            <label>
+              <span class="label-main">Dryback change</span>
+              <span class="label-unit">(% VWC)</span>
+            </label>
+            <input
+              type="number"
+              id="db_drybackPercent"
+              placeholder="e.g. 1"
+              step="0.01"
+              min="0"
+            />
+          </div>
+
+          <div class="field">
+            <label>
+              <span class="label-main">Over how many minutes</span>
+              <span class="label-unit">(min)</span>
+            </label>
+            <input
+              type="number"
+              id="db_intervalMinutes"
+              placeholder="e.g. 30"
+              step="1"
+              min="1"
+            />
+          </div>
+        </div>
+
+        <div class="rate-line" id="db_rateLine">
+          Dryback rate: <span class="rate-value ghost">-- %/min</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title-row">
+          <div class="section-title">Target Dryback</div>
+          <div class="section-hint">From last irrigation to next</div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field">
+            <label>
+              <span class="label-main">Current dryback</span>
+              <span class="label-unit">(% from last shot)</span>
+            </label>
+            <input
+              type="number"
+              id="db_currentDryback"
+              placeholder="0"
+              step="0.01"
+              min="0"
+            />
+          </div>
+
+          <div class="field">
+            <label>
+              <span class="label-main">Target dryback</span>
+              <span class="label-unit">(% from last shot)</span>
+            </label>
+            <input
+              type="number"
+              id="db_targetDryback"
+              placeholder="e.g. 2"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <button class="btn btn-primary" id="db_calcBtn">
+            ⚡ Calculate spacing
+          </button>
+        </div>
+
+        <div class="controls-row wrap-left">
+          <button class="btn btn-secondary btn-chip" id="db_p1Btn">P1 • 0.2%</button>
+          <button class="btn btn-secondary btn-chip" id="db_p2Btn">P2 • 2%</button>
+          <button class="btn btn-secondary btn-chip" id="db_on10Btn">Overnight • 10%</button>
+          <button class="btn btn-secondary btn-chip" id="db_on15Btn">Overnight • 15%</button>
+          <button class="btn btn-secondary btn-chip" id="db_on20Btn">Overnight • 20%</button>
+        </div>
+
+        <div id="db_errorBox" class="error" style="display:none;"></div>
+
+        <div id="db_resultCard" class="result-card" style="display:none;">
+          <div class="result-pill">
+            ⏱ Time between shots
+          </div>
+          <div class="result-main">
+            <div class="result-number" id="db_resultMinutes">0</div>
+            <div class="result-unit">minutes</div>
+          </div>
+          <div class="result-subline" id="db_resultSubline"></div>
+          <div class="result-meta" id="db_resultMeta"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RUNOFF VIEW -->
+    <div id="runoffView" class="view">
+      <div class="badge-row">
+        <div class="badge">
+          <span class="badge-dot"></span> Runoff % + mL
+        </div>
+        <div class="badge">
+          <span class="badge-dot"></span> Runtime by emitter
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title-row">
+          <div class="section-title">Shot Inputs</div>
+          <div class="section-hint">Per single block</div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field">
+            <label>
+              <span class="label-main">Dryback before shot</span>
+              <span class="label-unit">(% VWC)</span>
+            </label>
+            <input
+              type="number"
+              id="ro_drybackPercent"
+              placeholder="e.g. 1"
+              step="0.01"
+              min="0"
+            />
+          </div>
+
+          <div class="field">
+            <label>
+              <span class="label-main">Shot size</span>
+              <span class="label-unit">(% VWC)</span>
+            </label>
+            <input
+              type="number"
+              id="ro_shotPercent"
+              placeholder="e.g. 2"
+              step="0.01"
+              min="0"
+            />
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:8px;">
+          <label>
+            <span class="label-main">mL per 1% VWC</span>
+            <span class="label-unit">(default 35 mL)</span>
+          </label>
+          <input
+            type="number"
+            id="ro_mlPerPercent"
+            placeholder="35"
+            step="0.1"
+            min="0.1"
+          />
+        </div>
+
+        <div class="inline-note">
+          For a 6&quot; Hugo, <strong>35 mL ≈ 1% VWC</strong>. Adjust if you’ve mapped your own blocks.
+        </div>
+
+        <div class="inline-note" style="margin-top:6px;">
+          Emitter setup (for runtime):
+        </div>
+        <div class="controls-row wrap-left">
+          <button class="btn btn-secondary btn-chip" data-emitter="single_05">
+            1 × 0.5 gph
+          </button>
+          <button class="btn btn-secondary btn-chip" data-emitter="dual_03">
+            2 × 0.3 gph
+          </button>
+        </div>
+        <div class="inline-note">
+          Calibrated so a <strong>1% shot</strong> takes ~<strong>1:07</strong> (1×0.5 gph) or ~<strong>0:53</strong> (2×0.3 gph).
+        </div>
+
+        <div class="controls-row">
+          <button class="btn btn-secondary" id="ro_presetBtn">
+            1% dryback / 2% shot
+          </button>
+          <button class="btn btn-primary" id="ro_calcBtn">
+            ⚡ Calculate runoff
+          </button>
+        </div>
+
+        <div class="controls-row wrap-left" style="margin-top:8px;">
+          <span style="font-size:0.72rem;color:var(--muted);margin-right:4px;">Runoff targets:</span>
+          <button class="btn btn-secondary btn-chip" data-target="10">10%</button>
+          <button class="btn btn-secondary btn-chip" data-target="20">20%</button>
+          <button class="btn btn-secondary btn-chip" data-target="30">30%</button>
+          <button class="btn btn-secondary btn-chip" data-target="40">40%</button>
+        </div>
+
+        <div id="ro_errorBox" class="error" style="display:none;"></div>
+
+        <div id="ro_resultCard" class="result-card" style="display:none;">
+          <div class="result-pill">
+            💧 Your shot
+          </div>
+          <div class="result-main">
+            <div class="result-number" id="ro_runoffPercentDisplay">0</div>
+            <div class="result-unit">% of shot</div>
+          </div>
+          <div class="result-subline" id="ro_runoffMlDisplay"></div>
+          <div class="result-meta" id="ro_resultMeta"></div>
+          <div class="targets-block">
+            <div class="targets-title">
+              10–40% runoff targets (based on this dryback & block size):
+            </div>
+            <div class="targets-list" id="ro_targetsList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRICHOME VIEW -->
+    <div id="trichomeView" class="view">
+      <div class="badge-row">
+        <div class="badge">
+          <span class="badge-dot"></span> Photo-based ripeness
+        </div>
+        <div class="badge">
+          <span class="badge-dot"></span> Clear / Milky / Amber %
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tri-card-header">
+          <div class="tri-card-title">Trichome Photo Analyzer</div>
+          <div class="tri-chip-main">Upload macro or microscope image</div>
+        </div>
+
+        <div class="tri-file-row">
+          <div class="tri-file-label">Photo (close-up of trichomes):</div>
+          <input type="file" id="tri_fileInput" accept="image/*" />
+        </div>
+
+        <div class="tri-image-preview" id="tri_previewWrapper">
+          <img id="tri_previewImg" alt="Trichome preview" />
+        </div>
+
+        <div class="tri-results-grid">
+          <div class="tri-result-card">
+            <div class="tri-label-row-mini">
+              <div class="tri-label">Clear</div>
+              <div class="tri-chip tri-chip-clear">GLASSY</div>
+            </div>
+            <div class="tri-value-row">
+              <div class="tri-count" id="tri_clearCount">0</div>
+              <div class="tri-percent" id="tri_clearPercent">0%</div>
+            </div>
+          </div>
+
+          <div class="tri-result-card">
+            <div class="tri-label-row-mini">
+              <div class="tri-label">Milky</div>
+              <div class="tri-chip tri-chip-milky">CLOUDY</div>
+            </div>
+            <div class="tri-value-row">
+              <div class="tri-count" id="tri_milkyCount">0</div>
+              <div class="tri-percent" id="tri_milkyPercent">0%</div>
+            </div>
+          </div>
+
+          <div class="tri-result-card">
+            <div class="tri-label-row-mini">
+              <div class="tri-label">Amber</div>
+              <div class="tri-chip tri-chip-amber">OXIDIZED</div>
+            </div>
+            <div class="tri-value-row">
+              <div class="tri-count" id="tri_amberCount">0</div>
+              <div class="tri-percent" id="tri_amberPercent">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tri-overall" id="tri_overallText">
+          Load a close-up photo to estimate the ratio of <span>clear</span>, <span>milky</span>, and <span>amber</span> trichomes.
+        </div>
+        <div id="tri_stageBadge" class="tri-stage-badge" style="display:none;"></div>
+
+        <div class="tri-hint">
+          <strong>Tips:</strong> Use a sharply focused macro / microscope image. Fill the frame with trichome heads, not leaf/background. This is an approximate visual tool, not lab-grade analytics.
+        </div>
+
+        <canvas id="tri_canvas"></canvas>
+      </div>
+    </div>
+
+    <!-- EAZY PLUG VIEW -->
+    <div id="eazyPlugView" class="view">
+      <div class="badge-row">
+        <div class="badge">
+          <span class="badge-dot"></span> Eazy Plug Moisture
+        </div>
+        <div class="badge">
+          <span class="badge-dot"></span> Photo / Live Camera
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title-row">
+          <div class="section-title">Eazy Plug</div>
+          <div class="section-hint">Use live camera or upload a photo</div>
+        </div>
+
+        <!-- File upload fallback -->
+        <div class="field">
+          <label class="label-main">Plug photo (centered on 1 plug)</label>
+          <input type="file" id="ez_plugFileInput" accept="image/*" />
+        </div>
+
+        <!-- Live camera controls -->
+        <div class="controls-row wrap-left" style="margin-top:8px;">
+          <button class="btn btn-secondary" id="ez_startCamBtn">📷 Use live camera</button>
+          <span style="font-size:0.72rem;color:var(--muted);">
+            Point at 1 plug, fill the frame, then press <strong>Analyze</strong>.
+          </span>
+        </div>
+
+        <div class="ez-video-wrapper" id="ez_videoWrapper" style="display:none;">
+          <video id="ez_video" autoplay playsinline muted></video>
+        </div>
+
+        <div class="ez-image-preview" id="ez_previewWrapper" style="display:none;">
+          <img id="ez_previewImg" alt="Eazy plug preview" />
+        </div>
+
+        <div class="controls-row">
+          <button class="btn btn-primary" id="ez_analyzeBtn">⚡ Analyze Plug</button>
+        </div>
+
+        <div id="ez_resultCard" class="result-card" style="display:none;margin-top:10px;">
+          <div class="result-pill">
+            🌱 Eazy Plug Moisture
+          </div>
+          <div id="ez_statusBadge" class="ez-status-badge" style="display:none;"></div>
+          <div class="result-subline" id="ez_analysisResult">
+            No image analyzed yet.
+          </div>
+          <div class="debug-text" id="ez_brightnessDebug">
+            Average brightness: N/A
+          </div>
+
+          <div class="confidence-wrapper">
+            <span class="confidence-label">Confidence:</span>
+            <div class="confidence-bar-container">
+              <div class="confidence-bar" id="ez_confidenceBar"></div>
+            </div>
+            <span class="confidence-text" id="ez_confidenceText">N/A</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WEEKLY LIGHT LEVELS VIEW -->
+    <div id="weeklyLightView" class="view">
+      <div class="badge-row">
+        <div class="badge">
+          <span class="badge-dot"></span> Stage-based DLI
+        </div>
+        <div class="badge">
+          <span class="badge-dot"></span> Low / Medium / High PPFD
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title-row">
+          <div class="section-title">Weekly Light Levels</div>
+          <div class="section-hint">Pick stage to see DLI & PPFD</div>
+        </div>
+
+        <div class="field">
+          <label class="label-main">Plant Stage / Week</label>
+          <select id="wl_stageSelect">
+            <optgroup label="Vegetative">
+              <option value="veg_w1">Week 1 Veg</option>
+              <option value="veg_w2">Week 2 Veg</option>
+              <option value="veg_w3">Week 3 Veg</option>
+              <option value="veg_w4">Week 4 Veg</option>
+            </optgroup>
+            <optgroup label="Flower">
+              <option value="flower_w1">Week 1 Flower</option>
+              <option value="flower_w2">Week 2 Flower</option>
+              <option value="flower_w3">Week 3 Flower</option>
+              <option value="flower_w4">Week 4 Flower</option>
+              <option value="flower_w5">Week 5 Flower</option>
+              <option value="flower_w6">Week 6 Flower</option>
+              <option value="flower_w7">Week 7 Flower</option>
+              <option value="flower_w8">Week 8 Flower</option>
+              <option value="flower_w9">Week 9 Flower</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="field" style="margin-top:8px;">
+          <label class="label-main">Light hours per day</label>
+          <input id="wl_lightHours" type="number" min="6" max="24" step="0.5" placeholder="Default 18h veg / 12h flower" />
+        </div>
+
+        <div class="controls-row">
+          <button class="btn btn-primary" id="wl_calcBtn">⚡ Calculate Weekly Light</button>
+        </div>
+
+        <div id="wl_resultsCard" class="result-card" style="display:none;margin-top:10px;">
+          <div class="result-pill">📈 Weekly Light Levels</div>
+          <div id="wl_stageLabel" class="result-subline"><strong>Stage:</strong> –</div>
+
+          <div class="targets-block">
+            <div class="targets-title">Intensity levels:</div>
+            <div class="targets-list">
+              <div><strong>Low:</strong> <span id="wl_dliLow">–</span> → <span id="wl_ppfdLow">–</span> • <span id="wl_co2Low">–</span></div>
+              <div><strong>Medium:</strong> <span id="wl_dliMed">–</span> → <span id="wl_ppfdMed">–</span> • <span id="wl_co2Med">–</span></div>
+              <div><strong>High:</strong> <span id="wl_dliHigh">–</span> → <span id="wl_ppfdHigh">–</span> • <span id="wl_co2High">–</span></div>
+            </div>
+          </div>
+
+          <div class="result-meta" style="margin-top:6px;">
+            PPFD assumes relatively even canopy distribution at the selected hours.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footnote">
+      Built for rockwool steering. Always sanity-check against your room.
+    </div>
+  </div>
+
+  <script>
+    // Shared helpers
+    function formatNumber(value, digits) {
+      const d = typeof digits === 'number' ? digits : 2;
+      return Number(value).toFixed(d).replace(/\.00$/, '');
+    }
+
+    function humanTime(minutesFloat) {
+      const minutes = Math.max(0, minutesFloat);
+      const hours = Math.floor(minutes / 60);
+      const mins = Math.round(minutes - hours * 60);
+      let text = '';
+      if (hours > 0) text += hours + 'h ';
+      text += mins + 'min';
+      return text;
+    }
+
+    function formatRuntime(secondsFloat) {
+      const total = Math.max(0, secondsFloat);
+      const mins = Math.floor(total / 60);
+      const secs = Math.round(total - mins * 60);
+      const secText = secs.toString().padStart(2, '0');
+      return mins + 'm ' + secText + 's';
+    }
+
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const views = document.querySelectorAll('.view');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const viewId = btn.dataset.view;
+
+        if (viewId !== 'eazyPlugView' && typeof ez_stopCamera === 'function') {
+          ez_stopCamera();
+        }
+
+        tabButtons.forEach(b => b.classList.remove('active'));
+        views.forEach(v => v.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(viewId).classList.add('active');
+      });
+    });
+
+    // === DRYBACK LOGIC ===
+    const db_drybackPercentInput = document.getElementById('db_drybackPercent');
+    const db_intervalMinutesInput = document.getElementById('db_intervalMinutes');
+    const db_currentDrybackInput = document.getElementById('db_currentDryback');
+    const db_targetDrybackInput = document.getElementById('db_targetDryback');
+    const db_rateLine = document.getElementById('db_rateLine');
+    const db_calcBtn = document.getElementById('db_calcBtn');
+    const db_p1Btn = document.getElementById('db_p1Btn');
+    const db_p2Btn = document.getElementById('db_p2Btn');
+    const db_on10Btn = document.getElementById('db_on10Btn');
+    const db_on15Btn = document.getElementById('db_on15Btn');
+    const db_on20Btn = document.getElementById('db_on20Btn');
+    const db_errorBox = document.getElementById('db_errorBox');
+    const db_resultCard = document.getElementById('db_resultCard');
+    const db_resultMinutesEl = document.getElementById('db_resultMinutes');
+    const db_resultSublineEl = document.getElementById('db_resultSubline');
+    const db_resultMetaEl = document.getElementById('db_resultMeta');
+
+    function db_showError(msg) {
+      db_errorBox.textContent = msg;
+      db_errorBox.style.display = 'block';
+      db_resultCard.style.display = 'none';
+    }
+
+    function db_clearError() {
+      db_errorBox.textContent = '';
+      db_errorBox.style.display = 'none';
+    }
+
+    function db_updateRateDisplay() {
+      const dbVal = parseFloat(db_drybackPercentInput.value);
+      const interval = parseFloat(db_intervalMinutesInput.value);
+      const rateEl = db_rateLine.querySelector('.rate-value');
+
+      if (!isFinite(dbVal) || !isFinite(interval) || interval <= 0 || dbVal < 0) {
+        rateEl.textContent = '-- %/min';
+        rateEl.classList.add('ghost');
+        return;
+      }
+
+      const ratePerMin = dbVal / interval;
+      rateEl.textContent = formatNumber(ratePerMin, 3) + ' %/min';
+      rateEl.classList.remove('ghost');
+    }
+
+    function db_calculate(targetOverride) {
+      db_clearError();
+      db_resultCard.style.display = 'none';
+
+      const dbVal = parseFloat(db_drybackPercentInput.value);
+      const interval = parseFloat(db_intervalMinutesInput.value);
+      const current = db_currentDrybackInput.value === '' ? 0 : parseFloat(db_currentDrybackInput.value);
+      const target = typeof targetOverride === 'number'
+        ? targetOverride
+        : parseFloat(db_targetDrybackInput.value);
+
+      if (!isFinite(dbVal) || dbVal <= 0) {
+        db_showError('Enter how many % VWC you are drying back over your sensor interval (e.g. 1% over 30min).');
+        return;
+      }
+      if (!isFinite(interval) || interval <= 0) {
+        db_showError('Interval in minutes must be greater than 0 (e.g. 30).');
+        return;
+      }
+      if (!isFinite(target)) {
+        db_showError('Set a target dryback percentage from the last irrigation (e.g. 2%).');
+        return;
+      }
+      if (!isFinite(current) || current < 0) {
+        db_showError('Current dryback must be 0 or higher.');
+        return;
+      }
+      if (target < current) {
+        db_showError('Target dryback must be greater than or equal to current dryback.');
+        return;
+      }
+
+      const ratePerMin = dbVal / interval;
+      if (ratePerMin <= 0) {
+        db_showError('Rate per minute is zero or negative. Check your inputs.');
+        return;
+      }
+
+      const totalMinutesBetweenShots = target / ratePerMin;
+      const elapsedMinutesSinceLastShot = current / ratePerMin;
+      let pauseFromNow = totalMinutesBetweenShots - elapsedMinutesSinceLastShot;
+      if (pauseFromNow < 0) pauseFromNow = 0;
+
+      db_resultMinutesEl.textContent = formatNumber(totalMinutesBetweenShots, 1);
+
+      const totalHuman = humanTime(totalMinutesBetweenShots);
+      const pauseHuman = humanTime(pauseFromNow);
+      const elapsedHuman = humanTime(elapsedMinutesSinceLastShot);
+
+      db_resultSublineEl.textContent =
+        'Set the next irrigation ~' + totalHuman +
+        ' after the last shot to reach ' + formatNumber(target, 2) +
+        '% dryback at this rate.';
+
+      let meta = 'Rate ≈ ' + formatNumber(ratePerMin, 3) + '%/min • ' +
+                 formatNumber(dbVal, 2) + '% every ' + formatNumber(interval, 0) + ' min';
+
+      if (current > 0) {
+        meta =
+          'Already waited ~' + elapsedHuman + ' (≈ ' + formatNumber(current, 2) +
+          '% dryback). From now: pause another ~' + pauseHuman + '. • ' + meta;
+      } else {
+        meta =
+          'From now: pause ~' + totalHuman +
+          ' if you are starting right after a shot. • ' + meta;
+      }
+
+      db_resultMetaEl.textContent = meta;
+      db_resultCard.style.display = 'block';
+    }
+
+    db_drybackPercentInput.addEventListener('input', db_updateRateDisplay);
+    db_intervalMinutesInput.addEventListener('input', db_updateRateDisplay);
+
+    db_calcBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      db_calculate();
+    });
+
+    db_p1Btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      db_calculate(0.2);
+    });
+    db_p2Btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      db_calculate(2.0);
+    });
+    db_on10Btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      db_calculate(10.0);
+    });
+    db_on15Btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      db_calculate(15.0);
+    });
+    db_on20Btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      db_calculate(20.0);
+    });
+
+    // === RUNOFF LOGIC ===
+    const ro_drybackPercentInput = document.getElementById('ro_drybackPercent');
+    const ro_shotPercentInput = document.getElementById('ro_shotPercent');
+    const ro_mlPerPercentInput = document.getElementById('ro_mlPerPercent');
+    const ro_presetBtn = document.getElementById('ro_presetBtn');
+    const ro_calcBtn = document.getElementById('ro_calcBtn');
+    const ro_errorBox = document.getElementById('ro_errorBox');
+    const ro_resultCard = document.getElementById('ro_resultCard');
+    const ro_runoffPercentDisplay = document.getElementById('ro_runoffPercentDisplay');
+    const ro_runoffMlDisplay = document.getElementById('ro_runoffMlDisplay');
+    const ro_resultMeta = document.getElementById('ro_resultMeta');
+    const ro_targetsList = document.getElementById('ro_targetsList');
+    const ro_targetButtons = document.querySelectorAll('#runoffView button[data-target]');
+    const ro_emitterButtons = document.querySelectorAll('#runoffView button[data-emitter]');
+
+    let ro_activeEmitter = 'single_05';
+
+    const ro_baseSecondsPerPercent = {
+      single_05: 67,
+      dual_03: 53
+    };
+
+    function ro_showError(msg) {
+      ro_errorBox.textContent = msg;
+      ro_errorBox.style.display = 'block';
+      ro_resultCard.style.display = 'none';
+    }
+
+    function ro_clearError() {
+      ro_errorBox.textContent = '';
+      ro_errorBox.style.display = 'none';
+    }
+
+    function ro_computeTargets(dryback, mlPerPercent) {
+      const targets = [10, 20, 30, 40];
+      const lines = [];
+
+      if (dryback <= 0) {
+        lines.push('Set a dryback > 0 to see 10–40% target shots.');
+        return lines;
+      }
+
+      targets.forEach(t => {
+        const r = t / 100;
+        if (r <= 0 || r >= 0.99) return;
+
+        const shotNeeded = dryback / (1 - r);
+        const shotMl = shotNeeded * mlPerPercent;
+        const runoffMl = shotMl * r;
+
+        lines.push(
+          t + '% runoff → shot ≈ ' +
+          formatNumber(shotNeeded, 2) + '% (' +
+          formatNumber(shotMl, 1) + ' mL), runoff ≈ ' +
+          formatNumber(runoffMl, 1) + ' mL'
+        );
+      });
+
+      return lines;
+    }
+
+    function ro_applyTarget(t) {
+      let dryback = parseFloat(ro_drybackPercentInput.value);
+      if (!isFinite(dryback) || dryback <= 0) return;
+
+      let mlPer = ro_mlPerPercentInput.value === '' ? 35 : parseFloat(ro_mlPerPercentInput.value);
+      if (!isFinite(mlPer) || mlPer <= 0) mlPer = 35;
+
+      const r = t / 100;
+      if (r <= 0 || r >= 0.99) return;
+
+      const shotNeeded = dryback / (1 - r);
+      ro_shotPercentInput.value = formatNumber(shotNeeded, 3);
+      ro_calculate();
+    }
+
+    function ro_setActiveTargetButton(btn) {
+      ro_targetButtons.forEach(b => b.classList.remove('active-target'));
+      if (btn) btn.classList.add('active-target');
+    }
+
+    function ro_setActiveEmitterButton(btn) {
+      ro_emitterButtons.forEach(b => b.classList.remove('active-emitter'));
+      if (btn) btn.classList.add('active-emitter');
+    }
+
+    function ro_calculate() {
+      ro_clearError();
+
+      const dryback = parseFloat(ro_drybackPercentInput.value);
+      const shot = parseFloat(ro_shotPercentInput.value);
+      let mlPerPercent = ro_mlPerPercentInput.value === ''
+        ? 35
+        : parseFloat(ro_mlPerPercentInput.value);
+
+      if (!isFinite(dryback) || dryback < 0) {
+        ro_showError('Enter dryback before the shot (e.g. 1%).');
+        return;
+      }
+      if (!isFinite(shot) || shot <= 0) {
+        ro_showError('Enter shot size in % VWC (e.g. 2%).');
+        return;
+      }
+      if (!isFinite(mlPerPercent) || mlPerPercent <= 0) {
+        ro_showError('mL per 1% VWC must be greater than 0.');
+        return;
+      }
+
+      const runoffPercentVWC = shot - dryback;
+      const baseSec = ro_baseSecondsPerPercent[ro_activeEmitter] || ro_baseSecondsPerPercent.single_05;
+      const runtimeSeconds = shot * baseSec;
+
+      if (runoffPercentVWC <= 0) {
+        ro_runoffPercentDisplay.textContent = '0';
+        ro_runoffMlDisplay.textContent =
+          'No positive runoff expected (shot ≤ dryback).';
+        ro_resultMeta.textContent =
+          'Shot: ' + formatNumber(shot, 2) + '% • Dryback: ' +
+          formatNumber(dryback, 2) + '% • Block factor: ' +
+          formatNumber(mlPerPercent, 1) + ' mL/% • Runtime: ~' +
+          formatRuntime(runtimeSeconds) + ' (' +
+          (ro_activeEmitter === 'single_05' ? '1×0.5 gph' : '2×0.3 gph') + ').';
+
+        ro_targetsList.innerHTML = ro_computeTargets(dryback, mlPerPercent)
+          .map(line => '<div>' + line + '</div>')
+          .join('');
+        ro_resultCard.style.display = 'block';
+        return;
+      }
+
+      const runoffMl = runoffPercentVWC * mlPerPercent;
+      const runoffFractionOfShot = runoffPercentVWC / shot;
+      const runoffPercentOfShot = runoffFractionOfShot * 100;
+
+      ro_runoffPercentDisplay.textContent = formatNumber(runoffPercentOfShot, 1);
+      ro_runoffMlDisplay.textContent =
+        'Runoff ≈ ' + formatNumber(runoffMl, 1) +
+        ' mL per block (' + formatNumber(runoffPercentVWC, 2) +
+        '% VWC above storage).';
+
+      ro_resultMeta.textContent =
+        'Shot: ' + formatNumber(shot, 2) + '% • Dryback: ' +
+        formatNumber(dryback, 2) + '% • Block factor: ' +
+        formatNumber(mlPerPercent, 1) + ' mL/% • Runtime: ~' +
+        formatRuntime(runtimeSeconds) + ' (' +
+        (ro_activeEmitter === 'single_05' ? '1×0.5 gph' : '2×0.3 gph') + ').';
+
+      const lines = ro_computeTargets(dryback, mlPerPercent);
+      ro_targetsList.innerHTML = lines.map(line => '<div>' + line + '</div>').join('');
+
+      ro_resultCard.style.display = 'block';
+    }
+
+    ro_presetBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      ro_drybackPercentInput.value = '1';
+      ro_shotPercentInput.value = '2';
+      if (!ro_mlPerPercentInput.value) ro_mlPerPercentInput.value = '35';
+      ro_calculate();
+    });
+
+    ro_calcBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      ro_calculate();
+    });
+
+    ro_targetButtons.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const t = parseFloat(btn.dataset.target);
+        ro_setActiveTargetButton(btn);
+        ro_applyTarget(t);
+      });
+    });
+
+    ro_emitterButtons.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const key = btn.dataset.emitter;
+        ro_activeEmitter = key;
+        ro_setActiveEmitterButton(btn);
+      });
+    });
+
+    // === TRICHOME ANALYZER LOGIC ===
+    const tri_fileInput = document.getElementById('tri_fileInput');
+    const tri_previewWrapper = document.getElementById('tri_previewWrapper');
+    const tri_previewImg = document.getElementById('tri_previewImg');
+    const tri_canvas = document.getElementById('tri_canvas');
+    const tri_ctx = tri_canvas.getContext('2d');
+
+    const tri_clearCountEl = document.getElementById('tri_clearCount');
+    const tri_milkyCountEl = document.getElementById('tri_milkyCount');
+    const tri_amberCountEl = document.getElementById('tri_amberCount');
+    const tri_clearPercentEl = document.getElementById('tri_clearPercent');
+    const tri_milkyPercentEl = document.getElementById('tri_milkyPercent');
+    const tri_amberPercentEl = document.getElementById('tri_amberPercent');
+    const tri_overallText = document.getElementById('tri_overallText');
+    const tri_stageBadge = document.getElementById('tri_stageBadge');
+
+    function tri_rgbToHsv(r, g, b) {
+      r /= 255;
+      g /= 255;
+      b /= 255;
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      const d = max - min;
+      let h = 0;
+      if (d !== 0) {
+        if (max === r) {
+          h = (g - b) / d + (g < b ? 6 : 0);
+        } else if (max === g) {
+          h = (b - r) / d + 2;
+        } else {
+          h = (r - g) / d + 4;
+        }
+        h /= 6;
+      }
+      const s = max === 0 ? 0 : d / max;
+      const v = max;
+      return { h: h * 360, s, v };
+    }
+
+    function tri_classifyPixel(r, g, b) {
+      const { h, s, v } = tri_rgbToHsv(r, g, b);
+
+      if (v < 0.25) return "ignore";
+
+      if (v > 0.35 && s > 0.25 && h >= 20 && h <= 70) {
+        return "amber";
+      }
+
+      if (v > 0.75 && s < 0.18) {
+        return "clear";
+      }
+
+      if (v > 0.4 && s >= 0.1 && s <= 0.55) {
+        return "milky";
+      }
+
+      if (v > 0.6 && s < 0.2) {
+        return "milky";
+      }
+
+      return "ignore";
+    }
+
+    function tri_analyzeImage(img) {
+      const maxSize = 400;
+      let width = img.naturalWidth || img.width;
+      let height = img.naturalHeight || img.height;
+      const scale = Math.min(1, maxSize / Math.max(width, height));
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+
+      tri_canvas.width = width;
+      tri_canvas.height = height;
+      tri_ctx.drawImage(img, 0, 0, width, height);
+
+      const imageData = tri_ctx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+
+      const counts = { clear: 0, milky: 0, amber: 0, ignore: 0 };
+
+      for (let i = 0; i < data.length; i += 4 * 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+
+        const cls = tri_classifyPixel(r, g, b);
+        counts[cls] = (counts[cls] || 0) + 1;
+      }
+
+      const total = counts.clear + counts.milky + counts.amber;
+      if (total === 0) {
+        tri_clearCountEl.textContent = "0";
+        tri_milkyCountEl.textContent = "0";
+        tri_amberCountEl.textContent = "0";
+        tri_clearPercentEl.textContent = "0%";
+        tri_milkyPercentEl.textContent = "0%";
+        tri_amberPercentEl.textContent = "0%";
+        tri_overallText.textContent =
+          "Could not detect enough trichome-like pixels. Try a closer, sharper image focused on heads.";
+        tri_stageBadge.style.display = 'none';
+        return;
+      }
+
+      const pct = (val) => ((val / total) * 100).toFixed(1);
+
+      const clearPct = pct(counts.clear);
+      const milkyPct = pct(counts.milky);
+      const amberPct = pct(counts.amber);
+
+      tri_clearCountEl.textContent = counts.clear;
+      tri_milkyCountEl.textContent = counts.milky;
+      tri_amberCountEl.textContent = counts.amber;
+
+      tri_clearPercentEl.textContent = clearPct + "%";
+      tri_milkyPercentEl.textContent = milkyPct + "%";
+      tri_amberPercentEl.textContent = amberPct + "%";
+
+      tri_overallText.innerHTML =
+        'Estimated from this photo: <span>' + clearPct +
+        '% clear</span>, <span>' + milkyPct +
+        '% milky</span>, <span>' + amberPct + '% amber</span>.';
+
+      let stageText = "";
+      let stageClass = "";
+
+      const amberNum = parseFloat(amberPct);
+      const milkyNum = parseFloat(milkyPct);
+
+      if (amberNum < 3 && milkyNum >= 60) {
+        stageText = "Mostly milky, very little amber – close to peak, slightly earlier side.";
+        stageClass = "tri-stage-early";
+      } else if (amberNum >= 3 && amberNum <= 12 && milkyNum >= 50) {
+        stageText = "Peak window: strong milky presence with some amber showing.";
+        stageClass = "tri-stage-peak";
+      } else if (amberNum > 12) {
+        stageText = "Later-stage ripeness: significant amber, more sedative profile.";
+        stageClass = "tri-stage-late";
+      } else {
+        stageText = "Mixed signal – sanity-check with your own eye on multiple sites.";
+        stageClass = "";
+      }
+
+      if (stageText) {
+        tri_stageBadge.textContent = stageText;
+        tri_stageBadge.className = 'tri-stage-badge ' + stageClass;
+        tri_stageBadge.style.display = 'inline-block';
+      } else {
+        tri_stageBadge.style.display = 'none';
+      }
+    }
+
+    if (tri_fileInput) {
+      tri_fileInput.addEventListener('change', function(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          const img = new Image();
+          img.onload = function() {
+            tri_previewImg.src = img.src;
+            tri_previewWrapper.style.display = 'block';
+            tri_analyzeImage(img);
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // === EAZY PLUG MOISTURE LOGIC (+ LIVE CAMERA) ===
+    const ez_fileInput = document.getElementById('ez_plugFileInput');
+    const ez_previewWrapper = document.getElementById('ez_previewWrapper');
+    const ez_previewImg = document.getElementById('ez_previewImg');
+    const ez_analyzeBtn = document.getElementById('ez_analyzeBtn');
+    const ez_resultCard = document.getElementById('ez_resultCard');
+    const ez_analysisResult = document.getElementById('ez_analysisResult');
+    const ez_brightnessDebug = document.getElementById('ez_brightnessDebug');
+    const ez_confidenceBar = document.getElementById('ez_confidenceBar');
+    const ez_confidenceText = document.getElementById('ez_confidenceText');
+    const ez_statusBadge = document.getElementById('ez_statusBadge');
+
+    const ez_videoWrapper = document.getElementById('ez_videoWrapper');
+    const ez_video = document.getElementById('ez_video');
+    const ez_startCamBtn = document.getElementById('ez_startCamBtn');
+
+    let ez_stream = null;
+    let ez_usingCamera = false;
+
+    function ez_updateConfidenceBar(score) {
+      if (!ez_confidenceBar) return;
+      const clamped = Math.max(0, Math.min(100, score || 0));
+      ez_confidenceBar.style.width = clamped + "%";
+    }
+
+    function ez_computeBandConfidence(value, min, max) {
+      const center = (min + max) / 2;
+      const halfRange = (max - min) / 2;
+      const distanceFromEdge = halfRange - Math.abs(value - center);
+      const normalized = Math.max(0, distanceFromEdge / halfRange);
+      return normalized * 100;
+    }
+
+    function ez_analyzeImage(img) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      const maxSize = 400;
+      let width = img.naturalWidth || img.width;
+      let height = img.naturalHeight || img.height;
+      const scale = Math.min(1, maxSize / Math.max(width, height));
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const imageData = ctx.getImageData(0, 0, width, height).data;
+      let totalBrightness = 0;
+      let count = 0;
+
+      const w = width;
+      const h = height;
+
+      for (let i = 0; i < imageData.length; i += 80) {
+        const pixelIndex = i / 4;
+        const x = pixelIndex % w;
+        const y = Math.floor(pixelIndex / w);
+
+        if (x < w * 0.2 || x > w * 0.8 || y < h * 0.2 || y > h * 0.8) continue;
+
+        const r = imageData[i];
+        const g = imageData[i + 1];
+        const b = imageData[i + 2];
+        const brightness = (r + g + b) / 3;
+        totalBrightness += brightness;
+        count++;
+      }
+
+      if (count === 0) {
+        ez_analysisResult.textContent = "Could not analyze image (no valid pixels). Try filling the frame with a single plug.";
+        ez_brightnessDebug.textContent = "Average brightness: N/A";
+        ez_confidenceText.textContent = "Low (0%)";
+        ez_updateConfidenceBar(0);
+        if (ez_statusBadge) ez_statusBadge.style.display = "none";
+        ez_resultCard.style.display = 'block';
+        return;
+      }
+
+      const avg = totalBrightness / count;
+      ez_brightnessDebug.textContent = "Average brightness: " + avg.toFixed(1);
+
+      const darkMax = 90;
+      const mediumMax = 150;
+      const lightMax = 205;
+
+      let result = "";
+      let confidenceScore = 0;
+      let statusLabel = "";
+      let statusClass = "";
+
+      if (avg < darkMax) {
+        result = "Plug is dark → Fully saturated. Do NOT water.";
+        confidenceScore = ez_computeBandConfidence(avg, 0, darkMax);
+        statusLabel = "TOO WET – skip watering";
+        statusClass = "ez-status-wet";
+      } else if (avg >= darkMax && avg < mediumMax) {
+        result = "Plug is medium brown → Perfect moisture. Do NOT water yet.";
+        confidenceScore = ez_computeBandConfidence(avg, darkMax, mediumMax);
+        statusLabel = "GOOD – leave plugs alone";
+        statusClass = "ez-status-good";
+      } else if (avg >= mediumMax && avg < lightMax) {
+        result = "Plug is light brown → Water soon. This is the ideal time to re-wet.";
+        confidenceScore = ez_computeBandConfidence(avg, mediumMax, lightMax);
+        statusLabel = "ALMOST DRY – plan to water";
+        statusClass = "ez-status-drysoon";
+      } else {
+        result = "Plug is very pale / tan → TOO dry. Water immediately.";
+        confidenceScore = ez_computeBandConfidence(avg, lightMax, 255);
+        statusLabel = "DRY – water now";
+        statusClass = "ez-status-dry";
+      }
+
+      ez_analysisResult.textContent = result;
+
+      const confText = confidenceScore >= 75
+        ? "High"
+        : confidenceScore >= 50
+          ? "Medium"
+          : "Low";
+
+      ez_confidenceText.textContent = confText + " (" + Math.round(confidenceScore) + "%)";
+      ez_updateConfidenceBar(confidenceScore);
+
+      if (ez_statusBadge && statusLabel) {
+        ez_statusBadge.textContent = statusLabel;
+        ez_statusBadge.className = "ez-status-badge " + statusClass;
+        ez_statusBadge.style.display = "inline-block";
+      }
+
+      ez_resultCard.style.display = 'block';
+    }
+
+    function ez_resetResult() {
+      ez_resultCard.style.display = 'none';
+      ez_analysisResult.textContent = "No image analyzed yet.";
+      ez_brightnessDebug.textContent = "Average brightness: N/A";
+      ez_confidenceText.textContent = "N/A";
+      ez_updateConfidenceBar(0);
+      if (ez_statusBadge) ez_statusBadge.style.display = "none";
+    }
+
+    function ez_stopCamera() {
+      if (ez_stream) {
+        ez_stream.getTracks().forEach(t => t.stop());
+      }
+      ez_stream = null;
+      ez_usingCamera = false;
+      if (ez_video) ez_video.srcObject = null;
+      if (ez_videoWrapper) ez_videoWrapper.style.display = 'none';
+      if (ez_startCamBtn) ez_startCamBtn.textContent = "📷 Use live camera";
+    }
+
+    async function ez_startCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        ez_analysisResult.textContent = "Camera not supported in this browser. Use photo upload instead.";
+        ez_resultCard.style.display = 'block';
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" }
+        });
+        ez_stream = stream;
+        ez_usingCamera = true;
+        if (ez_video) {
+          ez_video.srcObject = stream;
+        }
+        if (ez_videoWrapper) ez_videoWrapper.style.display = 'block';
+        if (ez_startCamBtn) ez_startCamBtn.textContent = "⏹ Stop camera";
+      } catch (err) {
+        console.error(err);
+        ez_analysisResult.textContent = "Unable to access camera (permission denied or no camera). Use photo upload instead.";
+        ez_resultCard.style.display = 'block';
+      }
+    }
+
+    if (ez_startCamBtn) {
+      ez_startCamBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (ez_stream) {
+          ez_stopCamera();
+        } else {
+          ez_startCamera();
+        }
+      });
+    }
+
+    if (ez_fileInput) {
+      ez_fileInput.addEventListener('change', function(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          ez_previewImg.src = ev.target.result;
+          ez_previewWrapper.style.display = 'block';
+          ez_resetResult();
+          ez_usingCamera = false;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    if (ez_analyzeBtn) {
+      ez_analyzeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        if (ez_usingCamera && ez_video && ez_video.readyState >= 2) {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          canvas.width = ez_video.videoWidth || 640;
+          canvas.height = ez_video.videoHeight || 480;
+          ctx.drawImage(ez_video, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/png');
+
+          const img = new Image();
+          img.onload = function() {
+            ez_previewImg.src = dataUrl;
+            ez_previewWrapper.style.display = 'block';
+            ez_analyzeImage(img);
+          };
+          img.src = dataUrl;
+          return;
+        }
+
+        if (!ez_previewImg.src) {
+          ez_analysisResult.textContent = "Please upload a plug photo or start the camera first.";
+          ez_brightnessDebug.textContent = "Average brightness: N/A";
+          ez_confidenceText.textContent = "N/A";
+          ez_updateConfidenceBar(0);
+          if (ez_statusBadge) ez_statusBadge.style.display = "none";
+          ez_resultCard.style.display = 'block';
+          return;
+        }
+
+        const img = new Image();
+        img.onload = function() {
+          ez_analyzeImage(img);
+        };
+        img.src = ez_previewImg.src;
+      });
+    }
+
+    // === WEEKLY LIGHT LEVELS LOGIC ===
+    const wl_stageSelect = document.getElementById('wl_stageSelect');
+    const wl_lightHoursInput = document.getElementById('wl_lightHours');
+    const wl_calcBtn = document.getElementById('wl_calcBtn');
+    const wl_resultsCard = document.getElementById('wl_resultsCard');
+    const wl_stageLabel = document.getElementById('wl_stageLabel');
+    const wl_dliLowEl = document.getElementById('wl_dliLow');
+    const wl_dliMedEl = document.getElementById('wl_dliMed');
+    const wl_dliHighEl = document.getElementById('wl_dliHigh');
+    const wl_ppfdLowEl = document.getElementById('wl_ppfdLow');
+    const wl_ppfdMedEl = document.getElementById('wl_ppfdMed');
+    const wl_ppfdHighEl = document.getElementById('wl_ppfdHigh');
+    const wl_co2LowEl = document.getElementById('wl_co2Low');
+    const wl_co2MedEl = document.getElementById('wl_co2Med');
+    const wl_co2HighEl = document.getElementById('wl_co2High');
+
+    const WL_CO2_LEVELS = {
+      low: "800–900 ppm",
+      med: "1000–1200 ppm",
+      high: "1200–1400 ppm",
+    };
+
+    const WL_STAGE_MAP = {
+      veg_w1: { label: "Week 1 Veg", defaultHours: 18, dliLow: 10, dliMed: 13, dliHigh: 16 },
+      veg_w2: { label: "Week 2 Veg", defaultHours: 18, dliLow: 15, dliMed: 20, dliHigh: 25 },
+      veg_w3: { label: "Week 3 Veg", defaultHours: 18, dliLow: 20, dliMed: 28, dliHigh: 35 },
+      veg_w4: { label: "Week 4 Veg", defaultHours: 18, dliLow: 25, dliMed: 32, dliHigh: 40 },
+
+      flower_w1: { label: "Week 1 Flower", defaultHours: 12, dliLow: 28, dliMed: 32, dliHigh: 36 },
+      flower_w2: { label: "Week 2 Flower", defaultHours: 12, dliLow: 32, dliMed: 36, dliHigh: 40 },
+      flower_w3: { label: "Week 3 Flower", defaultHours: 12, dliLow: 35, dliMed: 40, dliHigh: 45 },
+      flower_w4: { label: "Week 4 Flower", defaultHours: 12, dliLow: 38, dliMed: 43, dliHigh: 48 },
+      flower_w5: { label: "Week 5 Flower", defaultHours: 12, dliLow: 40, dliMed: 45, dliHigh: 50 },
+      flower_w6: { label: "Week 6 Flower", defaultHours: 12, dliLow: 40, dliMed: 46, dliHigh: 52 },
+      flower_w7: { label: "Week 7 Flower", defaultHours: 12, dliLow: 38, dliMed: 44, dliHigh: 50 },
+      flower_w8: { label: "Week 8 Flower", defaultHours: 12, dliLow: 30, dliMed: 36, dliHigh: 42 },
+      flower_w9: { label: "Week 9 Flower", defaultHours: 12, dliLow: 28, dliMed: 34, dliHigh: 40 },
+    };
+
+    function wl_dliToPpfd(dli, hours) {
+      if (!hours || hours <= 0) return null;
+      return (dli * 1_000_000) / (hours * 3600);
+    }
+
+    function wl_format(num, decimals = 0) {
+      if (num === null || isNaN(num)) return "–";
+      return num.toFixed(decimals);
+    }
+
+    if (wl_stageSelect && wl_calcBtn) {
+      const initialStage = WL_STAGE_MAP[wl_stageSelect.value];
+      if (initialStage && !wl_lightHoursInput.value) {
+        wl_lightHoursInput.value = initialStage.defaultHours;
+      }
+
+      wl_stageSelect.addEventListener('change', () => {
+        const stage = WL_STAGE_MAP[wl_stageSelect.value];
+        if (stage && !wl_lightHoursInput.value) {
+          wl_lightHoursInput.value = stage.defaultHours;
+        }
+      });
+
+      wl_calcBtn.addEventListener('click', () => {
+        const stage = WL_STAGE_MAP[wl_stageSelect.value];
+        if (!stage) return;
+
+        let hours = parseFloat(wl_lightHoursInput.value);
+        if (!hours || hours <= 0) {
+          hours = stage.defaultHours;
+          wl_lightHoursInput.value = hours;
+        }
+
+        const ppfdLow = wl_dliToPpfd(stage.dliLow, hours);
+        const ppfdMed = wl_dliToPpfd(stage.dliMed, hours);
+        const ppfdHigh = wl_dliToPpfd(stage.dliHigh, hours);
+
+        wl_stageLabel.innerHTML = '<strong>Stage:</strong> ' + stage.label;
+
+        wl_dliLowEl.textContent = stage.dliLow + ' mol/m²/day';
+        wl_dliMedEl.textContent = stage.dliMed + ' mol/m²/day';
+        wl_dliHighEl.textContent = stage.dliHigh + ' mol/m²/day';
+
+        wl_ppfdLowEl.textContent = wl_format(ppfdLow, 0) + ' µmol/m²/s';
+        wl_ppfdMedEl.textContent = wl_format(ppfdMed, 0) + ' µmol/m²/s';
+        wl_ppfdHighEl.textContent = wl_format(ppfdHigh, 0) + ' µmol/m²/s';
+
+        if (WL_CO2_LEVELS) {
+          wl_co2LowEl.textContent = WL_CO2_LEVELS.low;
+          wl_co2MedEl.textContent = WL_CO2_LEVELS.med;
+          wl_co2HighEl.textContent = WL_CO2_LEVELS.high;
+        }
+
+        wl_resultsCard.style.display = 'block';
+      });
+    }
+
+    window.addEventListener('load', function() {
+      if (!ro_mlPerPercentInput.value) ro_mlPerPercentInput.value = '35';
+      const defaultEmitterBtn = document.querySelector('#runoffView button[data-emitter="single_05"]');
+      if (defaultEmitterBtn) ro_setActiveEmitterButton(defaultEmitterBtn);
+
+      if (!db_drybackPercentInput.value && !db_intervalMinutesInput.value) {
+        db_drybackPercentInput.value = '1';
+        db_intervalMinutesInput.value = '30';
+        db_updateRateDisplay();
+      }
+    });
+  </script>
+</body>
+</html>
